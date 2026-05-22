@@ -1,0 +1,17 @@
+name = "devbox-workers"
+main = "src/index.js"
+compatibility_date = "2026-05-22"
+workers_dev = true
+
+routes = [
+  { pattern = "box.w0x7ce.eu", custom_domain = true },
+  { pattern = "pypi.w0x7ce.eu", custom_domain = true },
+  { pattern = "hf.w0x7ce.eu", custom_domain = true },
+  { pattern = "github.w0x7ce.eu", custom_domain = true },
+  { pattern = "docker.w0x7ce.eu", custom_domain = true },
+  { pattern = "mirrors.w0x7ce.eu", custom_domain = true },
+  { pattern = "proxy.w0x7ce.eu", custom_domain = true }
+]
+
+[observability]
+enabled = true
