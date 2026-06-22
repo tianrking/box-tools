@@ -90,7 +90,9 @@ Click the Cloudflare button at the top of this README, or open:
 https://deploy.workers.cloudflare.com/?url=https://github.com/tianrking/box-tools
 ```
 
-Cloudflare reads `wrangler.toml`, creates the Worker, and applies the configured Worker settings. The default configuration binds one custom domain, `box.w0x7ce.eu`, and every tool is served from that domain by path.
+Cloudflare reads `wrangler.toml`, creates the Worker, and deploys it to the account-provided Worker name. The default configuration is intentionally portable: it enables `workers.dev`, disables preview URLs, and does not bind the maintainer's custom domain.
+
+After the Worker is deployed, add one custom domain in the Cloudflare dashboard, or copy the route block from `wrangler.custom-domain.example.toml` into `wrangler.toml` after confirming that the domain belongs to your Cloudflare account. Every tool will still use the same path model on that domain.
 
 ### Deploy to Vercel
 
@@ -241,20 +243,21 @@ src/index.js              Host/path router and health endpoint
 src/proxy-utils.js        Shared CORS, redirect, header, and proxy helpers
 src/tools/*.js            Individual tool implementations
 vercel.json               Vercel routing and build configuration
-wrangler.toml             Cloudflare Workers configuration
+wrangler.toml             Portable Cloudflare Workers deploy configuration
+wrangler.custom-domain.example.toml  Optional custom-domain configuration example
 ```
 
 ## Configuration
 
-Edit `src/config.js` when adding, renaming, or documenting a tool. Edit `wrangler.toml` when changing the Cloudflare Worker name, compatibility date, or primary custom domain.
+Edit `src/config.js` when adding, renaming, or documenting a tool. Edit `wrangler.toml` when changing the Cloudflare Worker name or compatibility date.
 
-For Vercel custom domains, add one primary domain in the Vercel dashboard and keep the same path routes.
+For Cloudflare custom domains, add the domain in the Cloudflare dashboard or use `wrangler.custom-domain.example.toml` as a reference after the domain is available in the target account. For Vercel custom domains, add one primary domain in the Vercel dashboard and keep the same path routes.
 
 ## Production Notes
 
 - Keep `npm run verify` green before deploying.
 - Keep `wrangler` updated; it is the local Cloudflare dev/deploy toolchain.
-- Cloudflare custom domains in `wrangler.toml` are account-specific.
+- Cloudflare custom domains are account-specific, so the portable default `wrangler.toml` does not hard-code one.
 - Use one primary domain for the public product experience; legacy per-tool hosts are not the recommended interaction model.
 - Some upstream services may have rate limits, authentication requirements, or terms of service that still apply through a proxy.
 

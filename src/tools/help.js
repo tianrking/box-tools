@@ -248,7 +248,7 @@ function htmlPage(request) {
         <p class="hint">用户可以直接使用网页，也可以把路径写进工具配置里长期使用。</p>
       </div>
       <div class="grid">
-        <div class="card"><span class="pill orange">Cloudflare</span><h3>单 Worker 单域名</h3><p>推荐只绑定 ${PROJECT.primaryHost}，通过路径分发全部工具。<code>wrangler.toml</code> 已按这个模型配置。</p></div>
+        <div class="card"><span class="pill orange">Cloudflare</span><h3>先部署，再绑定域名</h3><p><code>wrangler.toml</code> 默认适合一键部署到任意 Cloudflare 账户。绑定 ${PROJECT.primaryHost} 时，可参考 <code>wrangler.custom-domain.example.toml</code>。</p></div>
         <div class="card"><span class="pill dark">Vercel</span><h3>一键部署</h3><p><code>vercel.json</code> 会把所有路径转给 <code>api/index.js</code>，同一套路径玩法可直接复用。</p></div>
         <div class="card"><span class="pill pink">High availability</span><h3>上线前验证</h3><p>运行 <code>npm run verify</code>，它会检查 JS、页面导航、Vercel 入口、Docker API 路由和高危依赖审计。</p></div>
       </div>
