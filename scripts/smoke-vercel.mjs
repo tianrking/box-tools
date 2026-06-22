@@ -9,6 +9,11 @@ const TOOLS = [
   { key: "docker", path: "/docker", host: "docker.w0x7ce.eu" },
   { key: "mirrors", path: "/mirrors", host: "mirrors.w0x7ce.eu" },
   { key: "proxy", path: "/proxy", host: "proxy.w0x7ce.eu" },
+  { key: "npm", path: "/npm", host: "npm.w0x7ce.eu" },
+  { key: "go", path: "/go", host: "go.w0x7ce.eu" },
+  { key: "maven", path: "/maven", host: "maven.w0x7ce.eu" },
+  { key: "crates", path: "/crates", host: "crates.w0x7ce.eu" },
+  { key: "downloads", path: "/downloads", host: "downloads.w0x7ce.eu" },
   { key: "help", path: "/help", host: "box.w0x7ce.eu" },
 ];
 
@@ -37,6 +42,22 @@ const checks = [
     name: "docker registry route detection",
     request: new Request(`${BASE_URL}/v2/`, { method: "HEAD" }),
     assert: async (response) => [200, 401].includes(response.status),
+  },
+  {
+    name: "npm metadata rewrite",
+    request: new Request(`${BASE_URL}/npm/lodash`),
+    assert: async (response) => {
+      const text = await response.text();
+      return response.status === 200 && text.includes(`${BASE_URL}/npm/lodash/-/`);
+    },
+  },
+  {
+    name: "crates sparse config rewrite",
+    request: new Request(`${BASE_URL}/crates/config.json`),
+    assert: async (response) => {
+      const payload = await response.json();
+      return response.status === 200 && payload.dl === `${BASE_URL}/crates/api/v1/crates`;
+    },
   },
 ];
 

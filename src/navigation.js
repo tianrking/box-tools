@@ -12,6 +12,11 @@ const NAV_LABELS = {
   docker: "Docker",
   mirrors: "Linux",
   proxy: "Proxy",
+  npm: "npm",
+  go: "Go",
+  maven: "Maven",
+  crates: "Crates",
+  downloads: "Downloads",
   help: "Help",
 };
 

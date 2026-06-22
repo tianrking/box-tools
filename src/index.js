@@ -5,8 +5,13 @@ import github from "./tools/github.js";
 import help from "./tools/help.js";
 import hf from "./tools/hf.js";
 import mirrors from "./tools/mirrors.js";
+import npm from "./tools/npm.js";
 import proxy from "./tools/proxy.js";
 import pypi from "./tools/pypi.js";
+import go from "./tools/go.js";
+import maven from "./tools/maven.js";
+import crates from "./tools/crates.js";
+import downloads from "./tools/downloads.js";
 
 const HANDLERS = new Map([
   ["box", box],
@@ -17,6 +22,11 @@ const HANDLERS = new Map([
   ["docker", docker],
   ["mirrors", mirrors],
   ["proxy", proxy],
+  ["npm", npm],
+  ["go", go],
+  ["maven", maven],
+  ["crates", crates],
+  ["downloads", downloads],
 ]);
 
 const TOOLS = TOOL_DEFINITIONS.map((tool) => ({
@@ -39,10 +49,11 @@ export default {
         version: PROJECT.version,
         primaryHost: PROJECT.primaryHost,
         hostname: url.hostname,
-        tools: TOOL_DEFINITIONS.map(({ key, title, path, description }) => ({
+        tools: TOOL_DEFINITIONS.map(({ key, title, path, status, description }) => ({
           key,
           title,
           path,
+          status,
           description,
         })),
         pages: [HELP_DEFINITION],
