@@ -5,7 +5,7 @@
 <h1 align="center">DevBox Workers</h1>
 
 <p align="center">
-  A production-ready developer accelerator toolbox for PyPI, PyTorch, Hugging Face, GitHub, Docker registries, Linux mirrors, and universal file downloads.
+  A production-ready developer accelerator toolbox for PyPI, PyTorch, Hugging Face, GitHub, Docker registries, Linux mirrors, npm, Go modules, Maven, crates.io, runtime downloads, and universal file forwarding.
 </p>
 
 <p align="center">
@@ -27,11 +27,11 @@
 
 ## Why DevBox Workers
 
-DevBox Workers is a single-domain edge application that turns one repository into a fast, self-hostable developer toolbox. The recommended production model is one public domain, such as `box.w0x7ce.eu`, with each accelerator exposed by path: `/pypi`, `/hf`, `/github`, `/docker`, `/mirrors`, `/proxy`, and `/help`.
+DevBox Workers is a single-domain edge application that turns one repository into a fast, self-hostable developer toolbox. The recommended production model is one public domain, such as `box.w0x7ce.eu`, with each accelerator exposed by path: `/pypi`, `/hf`, `/github`, `/docker`, `/mirrors`, `/proxy`, `/npm`, `/go`, `/maven`, `/crates`, `/downloads`, and `/help`.
 
 Maintainer: [tianrking](https://github.com/tianrking)
 
-Keywords: Cloudflare Workers proxy, Vercel Functions proxy, PyPI mirror accelerator, PyTorch wheel proxy, Hugging Face mirror, Docker registry proxy, GitHub raw proxy, Linux mirror proxy, developer toolbox.
+Keywords: Cloudflare Workers proxy, Vercel Functions proxy, PyPI mirror accelerator, PyTorch wheel proxy, Hugging Face mirror, Docker registry proxy, GitHub raw proxy, Linux mirror proxy, npm registry proxy, Go module proxy, Maven proxy, Gradle mirror, crates.io sparse registry proxy, runtime download accelerator, developer toolbox.
 
 ## Tool Stack
 
@@ -48,6 +48,11 @@ Keywords: Cloudflare Workers proxy, Vercel Functions proxy, PyPI mirror accelera
   <img alt="Docker" src="https://img.shields.io/badge/Docker-registry-0db7ed?style=for-the-badge">
   <img alt="Linux mirrors" src="https://img.shields.io/badge/Linux-mirrors-8b5cf6?style=for-the-badge">
   <img alt="Universal proxy" src="https://img.shields.io/badge/Universal-file%20proxy-d946ef?style=for-the-badge">
+  <img alt="npm" src="https://img.shields.io/badge/npm-registry-cb3837?style=for-the-badge">
+  <img alt="Go modules" src="https://img.shields.io/badge/Go-modules-00add8?style=for-the-badge">
+  <img alt="Maven" src="https://img.shields.io/badge/Maven-Gradle-c71a36?style=for-the-badge">
+  <img alt="crates.io" src="https://img.shields.io/badge/crates.io-sparse-dea584?style=for-the-badge&labelColor=111827">
+  <img alt="Downloads" src="https://img.shields.io/badge/runtime-downloads-0f766e?style=for-the-badge">
   <img alt="Syntax check" src="https://img.shields.io/badge/syntax-check-22c55e?style=for-the-badge">
   <img alt="Smoke test" src="https://img.shields.io/badge/smoke-tested-22c55e?style=for-the-badge">
   <img alt="npm audit" src="https://img.shields.io/badge/npm-audit-22c55e?style=for-the-badge">
@@ -55,18 +60,25 @@ Keywords: Cloudflare Workers proxy, Vercel Functions proxy, PyPI mirror accelera
   <img alt="Wrangler" src="https://img.shields.io/badge/Wrangler-4.x-f38020?style=for-the-badge">
 </p>
 
-## Services
+## Service Matrix
 
-| Service | Single-domain route | What it does |
-| --- | --- | --- |
-| DevBox Portal | `/` or `/box` | Visual dashboard and usage snippets for every tool |
-| Help | `/help` | Beautiful route map, web usage, CLI recipes, and configuration guide |
-| PyPI / PyTorch | `/pypi` | PyPI simple index, package files, and PyTorch wheel proxy |
-| Hugging Face | `/hf` | Hugging Face API and LFS download forwarding |
-| GitHub | `/github` | Git clone, raw file, release asset, and page proxy |
-| Docker Registry | `/docker` UI, `/v2` API | Docker Hub plus `quay`, `gcr`, `k8s`, `ghcr`, `nvcr` prefixes |
-| Linux Mirrors | `/mirrors` | Pass-through mirror proxy for APT, YUM, DNF, Pacman, wget, curl |
-| Universal Proxy | `/proxy` | Universal URL forwarding and attachment filename handling |
+`Stable` means the route is recommended for daily use. `Test` means the accelerator is implemented, wired into smoke checks, and ready for validation before it is promoted to stable.
+
+| Status | Service | Single-domain route | What it accelerates |
+| --- | --- | --- | --- |
+| Stable | DevBox Portal | `/` or `/box` | Visual dashboard and usage snippets for every tool |
+| Stable | Help | `/help` | Route map, web usage, CLI recipes, and configuration guide |
+| Stable | PyPI / PyTorch | `/pypi` | PyPI simple index, package files, and PyTorch wheel downloads |
+| Stable | Hugging Face | `/hf` | Hugging Face API, model files, datasets, and LFS downloads |
+| Stable | GitHub | `/github` | Git clone, raw files, release assets, and GitHub pages |
+| Stable | Docker Registry | `/docker` UI, `/v2` API | Docker Hub plus `quay`, `gcr`, `k8s`, `ghcr`, `nvcr` prefixes |
+| Stable | Linux Mirrors | `/mirrors` | APT, YUM, DNF, Pacman, wget, and curl mirror paths |
+| Stable | Universal Proxy | `/proxy` | Any HTTP/HTTPS file URL with filename handling |
+| Test | npm Registry | `/npm` | npm, pnpm, yarn metadata and tarball downloads |
+| Test | Go Module Proxy | `/go` | GOPROXY module list, version metadata, `.mod`, and `.zip` files |
+| Test | Maven / Gradle | `/maven` | Maven Central, Google Maven, Gradle Plugin Portal, and JitPack |
+| Test | crates.io Sparse | `/crates` | Cargo sparse index and `.crate` package downloads |
+| Test | Runtime Downloads | `/downloads` | Node.js, Python, Go, Rustup, Open VSX, SourceForge, GitLab, Gitea, and direct file URLs |
 
 ## One-Click Deployment
 
@@ -88,7 +100,7 @@ Click the Vercel button at the top of this README, or open:
 https://vercel.com/new/clone?repository-url=https://github.com/tianrking/box-tools
 ```
 
-Vercel uses `api/index.js` as a Web Handler function and `vercel.json` to route every path to that function. The Vercel deployment uses the same path model: `/pypi`, `/hf`, `/github`, `/docker`, `/mirrors`, `/proxy`, and `/help`. Docker Registry API traffic is also auto-detected at `/v2`, `/token`, and `/_worker_blob_proxy`, so a single Vercel domain can serve Docker pulls without a `/docker` prefix in the image name.
+Vercel uses `api/index.js` as a Web Handler function and `vercel.json` to route every path to that function. The Vercel deployment uses the same path model: `/pypi`, `/hf`, `/github`, `/docker`, `/mirrors`, `/proxy`, `/npm`, `/go`, `/maven`, `/crates`, `/downloads`, and `/help`. Docker Registry API traffic is also auto-detected at `/v2`, `/token`, and `/_worker_blob_proxy`, so a single Vercel domain can serve Docker pulls without a `/docker` prefix in the image name.
 
 ## Local Development
 
@@ -177,6 +189,46 @@ Proxy a generic file:
 curl -L -O "https://box.w0x7ce.eu/proxy/https://example.com/file.zip"
 ```
 
+Use the new test npm registry route:
+
+```bash
+npm install lodash --registry=https://box.w0x7ce.eu/npm/
+pnpm install lodash --registry=https://box.w0x7ce.eu/npm/
+```
+
+Use the new test Go module route:
+
+```bash
+go env -w GOPROXY=https://box.w0x7ce.eu/go,direct
+```
+
+Use the new test Maven / Gradle routes:
+
+```kotlin
+repositories {
+    maven { url = uri("https://box.w0x7ce.eu/maven/maven-central") }
+    maven { url = uri("https://box.w0x7ce.eu/maven/google") }
+    maven { url = uri("https://box.w0x7ce.eu/maven/gradle-plugin") }
+}
+```
+
+Use the new test crates.io sparse route:
+
+```toml
+[source.crates-io]
+replace-with = "devbox"
+
+[source.devbox]
+registry = "sparse+https://box.w0x7ce.eu/crates/"
+```
+
+Use the new test runtime download route:
+
+```bash
+curl -L -O "https://box.w0x7ce.eu/downloads/node/v22.11.0/node-v22.11.0-x64.msi"
+curl -L -O "https://box.w0x7ce.eu/downloads/https://example.com/file.zip"
+```
+
 ## Project Layout
 
 ```text
@@ -186,6 +238,7 @@ scripts/smoke-vercel.mjs  Vercel runtime smoke test
 src/config.js             Project metadata, service registry, health paths
 src/html.js               HTML rewrite fallback for non-Cloudflare runtimes
 src/index.js              Host/path router and health endpoint
+src/proxy-utils.js        Shared CORS, redirect, header, and proxy helpers
 src/tools/*.js            Individual tool implementations
 vercel.json               Vercel routing and build configuration
 wrangler.toml             Cloudflare Workers configuration
@@ -207,6 +260,7 @@ For Vercel custom domains, add one primary domain in the Vercel dashboard and ke
 
 ## Roadmap
 
+- Promote test accelerators to stable after more upstream compatibility checks.
 - Add configurable service domains through environment variables.
 - Add structured access logs and optional request tracing.
 - Add per-tool smoke tests with mocked upstream responses.
