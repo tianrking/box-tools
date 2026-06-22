@@ -1,5 +1,194 @@
 import { PROJECT, TOOL_DEFINITIONS } from "../config.js";
+import { getLanguage, LANGUAGES, renderLanguageSwitch } from "../i18n.js";
 import { getDockerRegistryHost, getToolBaseUrl, renderToolNav } from "../navigation.js";
+import { escapeHtml } from "../proxy-utils.js";
+
+const COPY = {
+  en: {
+    metaDescription:
+      "DevBox Workers help page: one-domain routes, web UI, CLI usage, package proxy configuration, Docker registry usage, and deployment notes.",
+    eyebrow: "DevBox Workers Help",
+    title: "One domain. Every accelerator.",
+    lead:
+      "Use DevBox Workers as a single-domain edge toolbox. Open a web page for guided commands, or copy the routes into package managers, CLIs, Docker, and download tools.",
+    primaryDomain: "Primary domain",
+    runtime: "Runtime",
+    health: "Health",
+    stable: "Stable",
+    test: "Test",
+    testNote: "Test routes are implemented and verified by smoke tests, but should be validated in your own workflow before being treated as stable.",
+    webTitle: "How the Web UI Works",
+    webHint: "Tool names stay in English. Explanations and usage notes follow the selected language.",
+    portalTitle: "Portal",
+    portalText: "Start from the main dashboard, scan all accelerators, and open the specific tool page you need.",
+    pathTitle: "Single-domain paths",
+    pathText: "Every accelerator runs under the same domain with a dedicated path, which fits Cloudflare Workers and Vercel deployments.",
+    cliTitle: "CLI ready",
+    cliText: "pip, huggingface-cli, git, docker, npm, go, cargo, wget, and curl can use generated URLs directly.",
+    routeTitle: "Route Matrix",
+    routeHint: "These are the current service entry points for this deployment.",
+    thStatus: "Status",
+    thService: "Service",
+    thEntry: "Entry",
+    thUsage: "What it accelerates",
+    commandTitle: "Command Recipes",
+    commandHint: "Commands are generated from the active domain. Replace package names, model names, or file URLs as needed.",
+    copyHint: "copy and edit",
+    deployTitle: "Configuration and Deployment",
+    deployHint: "Use the web UI directly, or persist routes inside your tools for long-term acceleration.",
+    cloudflareTitle: "Deploy first, then bind a domain",
+    cloudflareText:
+      "The default wrangler.toml is portable for one-click Cloudflare deployment. Use wrangler.custom-domain.example.toml only after the domain is available in the target account.",
+    vercelTitle: "One-click Vercel",
+    vercelText:
+      "vercel.json forwards every path to api/index.js, so the same path model works on Vercel domains.",
+    verifyTitle: "Verify before production",
+    verifyText:
+      "Run npm run verify before deployment. It checks JavaScript syntax, page navigation, Vercel routing, Docker API routing, and high-severity npm audit results.",
+  },
+  es: {
+    metaDescription:
+      "Pagina de ayuda de DevBox Workers: rutas en un solo dominio, interfaz web, uso de CLI, proxies de paquetes, Docker y notas de despliegue.",
+    eyebrow: "Ayuda de DevBox Workers",
+    title: "Un dominio. Todos los aceleradores.",
+    lead:
+      "Usa DevBox Workers como una caja de herramientas edge con un solo dominio. Abre una pagina web para obtener comandos guiados, o copia las rutas en gestores de paquetes, CLI, Docker y herramientas de descarga.",
+    primaryDomain: "Dominio principal",
+    runtime: "Runtime",
+    health: "Salud",
+    stable: "Stable",
+    test: "Test",
+    testNote: "Las rutas Test estan implementadas y cubiertas por smoke tests, pero conviene validarlas en tu propio flujo antes de tratarlas como estables.",
+    webTitle: "Como funciona la interfaz web",
+    webHint: "Los nombres de herramientas se mantienen en ingles. Las explicaciones y el uso siguen el idioma seleccionado.",
+    portalTitle: "Portal",
+    portalText: "Empieza en el panel principal, revisa todos los aceleradores y abre la pagina especifica que necesites.",
+    pathTitle: "Rutas en un solo dominio",
+    pathText: "Cada acelerador vive bajo el mismo dominio con una ruta dedicada, ideal para Cloudflare Workers y Vercel.",
+    cliTitle: "Listo para CLI",
+    cliText: "pip, huggingface-cli, git, docker, npm, go, cargo, wget y curl pueden usar directamente las URLs generadas.",
+    routeTitle: "Matriz de rutas",
+    routeHint: "Estos son los puntos de entrada actuales para este despliegue.",
+    thStatus: "Estado",
+    thService: "Servicio",
+    thEntry: "Entrada",
+    thUsage: "Que acelera",
+    commandTitle: "Recetas de comandos",
+    commandHint: "Los comandos se generan desde el dominio activo. Cambia nombres de paquetes, modelos o URLs segun necesites.",
+    copyHint: "copiar y editar",
+    deployTitle: "Configuracion y despliegue",
+    deployHint: "Usa la interfaz web directamente o guarda las rutas en tus herramientas para acelerar de forma permanente.",
+    cloudflareTitle: "Despliega primero, luego vincula dominio",
+    cloudflareText:
+      "El wrangler.toml por defecto es portable para despliegue de Cloudflare con un clic. Usa wrangler.custom-domain.example.toml solo despues de confirmar que el dominio existe en la cuenta destino.",
+    vercelTitle: "Vercel con un clic",
+    vercelText:
+      "vercel.json envia todas las rutas a api/index.js, asi que el mismo modelo de rutas funciona en dominios de Vercel.",
+    verifyTitle: "Verifica antes de produccion",
+    verifyText:
+      "Ejecuta npm run verify antes de desplegar. Revisa sintaxis JavaScript, navegacion, rutas de Vercel, API de Docker y auditoria npm de alta severidad.",
+  },
+  zh: {
+    metaDescription:
+      "DevBox Workers 帮助页面：单域名路径、网页入口、命令行用法、包代理配置、Docker registry 用法和部署说明。",
+    eyebrow: "DevBox Workers 帮助",
+    title: "一个域名，所有加速入口。",
+    lead:
+      "把 DevBox Workers 当作单域名边缘工具箱使用。你可以打开网页生成命令，也可以把路径写入包管理器、命令行工具、Docker 和下载工具。",
+    primaryDomain: "主域名",
+    runtime: "运行时",
+    health: "健康检查",
+    stable: "Stable",
+    test: "Test",
+    testNote: "Test 路由已经实现并接入 smoke test，但建议在自己的工作流里验证后再提升为稳定用法。",
+    webTitle: "网页怎么用",
+    webHint: "工具名字保持英文，说明和使用方式会跟随当前选择的语言。",
+    portalTitle: "入口面板",
+    portalText: "从主面板进入，快速浏览所有加速器，并打开你需要的专属工具页面。",
+    pathTitle: "单域名路径",
+    pathText: "所有加速器都在同一个域名下，通过不同路径区分服务，适合 Cloudflare Workers 和 Vercel 部署。",
+    cliTitle: "命令行友好",
+    cliText: "pip、huggingface-cli、git、docker、npm、go、cargo、wget、curl 都可以直接使用生成的 URL。",
+    routeTitle: "路由矩阵",
+    routeHint: "这是当前部署环境下的实际入口。",
+    thStatus: "状态",
+    thService: "服务",
+    thEntry: "入口",
+    thUsage: "可加速资源",
+    commandTitle: "命令行示例",
+    commandHint: "命令会根据当前域名生成，复制后替换包名、模型名或文件 URL 即可。",
+    copyHint: "复制后修改",
+    deployTitle: "配置和部署",
+    deployHint: "你可以直接使用网页，也可以把路径写进工具配置里长期使用。",
+    cloudflareTitle: "先部署，再绑定域名",
+    cloudflareText:
+      "默认 wrangler.toml 适合一键部署到任意 Cloudflare 账户。只有确认域名属于目标账户后，再参考 wrangler.custom-domain.example.toml 绑定自定义域名。",
+    vercelTitle: "Vercel 一键部署",
+    vercelText:
+      "vercel.json 会把所有路径转给 api/index.js，同一套路由模型可以直接用于 Vercel 域名。",
+    verifyTitle: "上线前验证",
+    verifyText:
+      "部署前运行 npm run verify。它会检查 JavaScript 语法、页面导航、Vercel 路由、Docker API 路由和高危 npm audit。",
+  },
+};
+
+const SERVICES = [
+  ["stable", "PyPI / PyTorch", "pypi", {
+    en: "PyPI simple index, Python packages, and PyTorch wheels.",
+    es: "Indice simple de PyPI, paquetes Python y wheels de PyTorch.",
+    zh: "PyPI simple index、Python 包和 PyTorch wheel。",
+  }],
+  ["stable", "Hugging Face", "hf", {
+    en: "Models, datasets, API requests, and LFS downloads.",
+    es: "Modelos, datasets, peticiones API y descargas LFS.",
+    zh: "模型、数据集、API 请求和 LFS 大文件下载。",
+  }],
+  ["stable", "GitHub", "github", {
+    en: "Git clone, raw files, releases, and GitHub pages.",
+    es: "Git clone, archivos raw, releases y paginas de GitHub.",
+    zh: "Git clone、Raw 文件、Release 资源和 GitHub 页面。",
+  }],
+  ["stable", "Docker", "docker", {
+    en: "Docker Hub and multi-registry image pulls through the current /v2 host.",
+    es: "Docker Hub y pulls de imagenes multi-registry usando el host /v2 actual.",
+    zh: "Docker Hub 和多镜像仓库拉取，通过当前域名的 /v2 使用。",
+  }],
+  ["stable", "Linux Mirrors", "mirrors", {
+    en: "APT, YUM, DNF, Pacman, wget, and curl mirror paths.",
+    es: "Rutas espejo para APT, YUM, DNF, Pacman, wget y curl.",
+    zh: "APT、YUM、DNF、Pacman、wget、curl 的软件源路径。",
+  }],
+  ["stable", "Universal Proxy", "proxy", {
+    en: "Any HTTP or HTTPS file URL with redirect and filename handling.",
+    es: "Cualquier URL HTTP o HTTPS con manejo de redirecciones y nombres de archivo.",
+    zh: "任意 HTTP/HTTPS 文件 URL，带重定向和文件名处理。",
+  }],
+  ["test", "npm Registry", "npm", {
+    en: "npm, pnpm, and yarn metadata plus tarball downloads.",
+    es: "Metadata y tarballs para npm, pnpm y yarn.",
+    zh: "npm、pnpm、yarn metadata 和 tarball 下载。",
+  }],
+  ["test", "Go Modules", "go", {
+    en: "GOPROXY module metadata, .mod files, and .zip files.",
+    es: "Metadata GOPROXY, archivos .mod y archivos .zip.",
+    zh: "GOPROXY module metadata、.mod 和 .zip 文件。",
+  }],
+  ["test", "Maven / Gradle", "maven", {
+    en: "Maven Central, Google Maven, Gradle Plugin Portal, and JitPack.",
+    es: "Maven Central, Google Maven, Gradle Plugin Portal y JitPack.",
+    zh: "Maven Central、Google Maven、Gradle Plugin Portal、JitPack。",
+  }],
+  ["test", "crates.io Sparse", "crates", {
+    en: "Cargo sparse index and crate package downloads.",
+    es: "Indice sparse de Cargo y descargas de paquetes crate.",
+    zh: "Cargo sparse index 和 crate 包下载。",
+  }],
+  ["test", "Downloads", "downloads", {
+    en: "Runtimes, Open VSX, SourceForge, GitLab, Gitea, and direct file URLs.",
+    es: "Runtimes, Open VSX, SourceForge, GitLab, Gitea y URLs directas.",
+    zh: "运行时、Open VSX、SourceForge、GitLab、Gitea 和直接 URL 文件。",
+  }],
+];
 
 export default {
   async fetch(request) {
@@ -13,24 +202,28 @@ export default {
 };
 
 function htmlPage(request) {
+  const lang = getLanguage(request);
+  const copy = COPY[lang] ?? COPY.en;
+  const htmlLang = LANGUAGES[lang]?.htmlLang ?? "en";
   const urls = Object.fromEntries(TOOL_DEFINITIONS.map((tool) => [tool.key, getToolBaseUrl(request, tool.key)]));
   const dockerHost = getDockerRegistryHost(request);
   const proxyDownloadBase = urls.proxy.endsWith("/proxy") ? urls.proxy : `${urls.proxy}/proxy`;
   const nav = renderToolNav(request, "help");
+  const languageSwitch = renderLanguageSwitch(request, lang);
 
   return `<!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="${htmlLang}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Help | ${PROJECT.name}</title>
-  <meta name="description" content="DevBox Workers help page: one-domain routes, web UI, command line usage, package proxy configuration, Docker registry usage, and deployment notes.">
+  <meta name="description" content="${escapeHtml(copy.metaDescription)}">
   <style>
     :root {
-      --bg: #f8fafc;
+      --bg: #f6f8fb;
       --panel: #ffffff;
-      --text: #111827;
-      --muted: #5b6472;
+      --text: #101827;
+      --muted: #647084;
       --border: #dbe3ee;
       --blue: #2563eb;
       --green: #16a34a;
@@ -38,82 +231,118 @@ function htmlPage(request) {
       --violet: #7c3aed;
       --pink: #d946ef;
       --slate: #0f172a;
+      --shadow: 0 18px 48px rgba(15, 23, 42, 0.08);
     }
-
     * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: var(--bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(37, 99, 235, 0.10), transparent 28%),
+        radial-gradient(circle at 88% 12%, rgba(22, 163, 74, 0.10), transparent 26%),
+        linear-gradient(180deg, #ffffff 0%, var(--bg) 44%, #eef3f9 100%);
       color: var(--text);
     }
-
     .nav {
       position: sticky;
       top: 0;
       z-index: 20;
       display: flex;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
       justify-content: flex-end;
       padding: 14px 24px;
       background: rgba(255, 255, 255, 0.86);
       border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(14px);
+      backdrop-filter: blur(16px);
     }
     .nav a {
       text-decoration: none;
       color: var(--muted);
       font-size: 13px;
       font-weight: 800;
-      padding: 8px 14px;
+      padding: 8px 12px;
       border-radius: 999px;
       border: 1px solid transparent;
-      transition: all 0.2s ease;
+      transition: all 0.18s ease;
     }
     .nav a:hover { color: var(--slate); background: #eef2ff; }
     .nav a.active { color: #fff; background: var(--slate); border-color: var(--slate); }
-
-    main { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 54px 0 80px; }
-    .hero { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 36px; align-items: end; margin-bottom: 36px; }
-    h1 { margin: 0 0 14px; font-size: clamp(34px, 6vw, 64px); line-height: 1.02; letter-spacing: 0; }
-    .lead { margin: 0; max-width: 760px; color: var(--muted); font-size: 18px; line-height: 1.7; }
-    .hero-panel {
-      border: 1px solid var(--border);
-      background: var(--panel);
-      border-radius: 8px;
-      padding: 22px;
-      box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+    main { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 42px 0 84px; }
+    .language-switch {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      margin-bottom: 24px;
     }
-    .metric { display: flex; justify-content: space-between; gap: 18px; padding: 12px 0; border-bottom: 1px solid #edf2f7; }
+    .language-switch a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 900;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.78);
+    }
+    .language-switch a.active { color: #fff; background: var(--blue); border-color: var(--blue); }
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.18fr) minmax(300px, 0.82fr);
+      gap: 28px;
+      align-items: stretch;
+      margin-bottom: 30px;
+    }
+    .hero-copy, .hero-panel, .band, .command, .route-table {
+      background: rgba(255,255,255,0.88);
+      border: 1px solid rgba(219, 227, 238, 0.92);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+    }
+    .hero-copy { padding: clamp(28px, 5vw, 48px); }
+    .eyebrow {
+      display: inline-flex;
+      color: var(--blue);
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    h1 { margin: 0 0 16px; font-size: clamp(38px, 7vw, 72px); line-height: 0.98; letter-spacing: 0; }
+    .lead { margin: 0; max-width: 760px; color: var(--muted); font-size: 18px; line-height: 1.72; }
+    .hero-panel { padding: 24px; display: grid; align-content: center; }
+    .metric { display: grid; gap: 6px; padding: 14px 0; border-bottom: 1px solid #edf2f7; }
     .metric:last-child { border-bottom: 0; }
-    .metric span { color: var(--muted); }
-    .metric strong { text-align: right; }
-
-    .band { margin-top: 28px; }
-    .section-head { display: flex; justify-content: space-between; gap: 16px; align-items: end; margin-bottom: 14px; }
-    h2 { margin: 0; font-size: 24px; letter-spacing: 0; }
-    .hint { margin: 0; color: var(--muted); line-height: 1.6; }
+    .metric span { color: var(--muted); font-size: 13px; font-weight: 800; text-transform: uppercase; }
+    .metric strong { overflow-wrap: anywhere; }
+    .band { margin-top: 18px; padding: 22px; }
+    .section-head { display: flex; justify-content: space-between; gap: 18px; align-items: end; margin-bottom: 16px; }
+    h2 { margin: 0; font-size: 25px; letter-spacing: 0; }
+    .hint { margin: 0; color: var(--muted); line-height: 1.62; max-width: 620px; }
     .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
     .card {
-      background: var(--panel);
+      background: #fff;
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 12px;
       padding: 18px;
-      min-height: 150px;
+      min-height: 156px;
     }
     .card h3 { margin: 0 0 10px; font-size: 17px; }
-    .card p { margin: 0; color: var(--muted); line-height: 1.55; }
+    .card p { margin: 0; color: var(--muted); line-height: 1.58; }
     .pill {
       display: inline-flex;
       align-items: center;
-      padding: 4px 9px;
+      padding: 5px 10px;
       border-radius: 999px;
       color: #fff;
       background: var(--blue);
       font-size: 12px;
-      font-weight: 800;
+      font-weight: 900;
       margin-bottom: 12px;
     }
     .pill.green { background: var(--green); }
@@ -121,136 +350,122 @@ function htmlPage(request) {
     .pill.violet { background: var(--violet); }
     .pill.pink { background: var(--pink); }
     .pill.dark { background: var(--slate); }
-
-    .commands { display: grid; gap: 14px; }
-    .command {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 8px;
+    .route-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
       overflow: hidden;
     }
+    .route-table th, .route-table td { padding: 14px 16px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+    .route-table th { background: #f8fafc; font-size: 13px; color: var(--muted); }
+    .route-table tr:last-child td { border-bottom: 0; }
+    .route-table a { color: var(--blue); font-weight: 900; text-decoration: none; overflow-wrap: anywhere; }
+    .route-table a:hover { text-decoration: underline; }
+    .commands { display: grid; gap: 14px; }
+    .command { overflow: hidden; }
     .command-header {
       display: flex;
       justify-content: space-between;
       gap: 12px;
       padding: 13px 16px;
       border-bottom: 1px solid var(--border);
-      font-weight: 800;
+      font-weight: 900;
     }
-    .command-header span { color: var(--muted); font-size: 13px; font-weight: 700; }
+    .command-header span { color: var(--muted); font-size: 13px; font-weight: 800; }
     pre {
       margin: 0;
       padding: 16px;
       overflow-x: auto;
-      background: #111827;
+      background: #101827;
       color: #d1fae5;
       font-size: 13px;
-      line-height: 1.6;
+      line-height: 1.62;
     }
     code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
-    .route-table {
-      width: 100%;
-      border-collapse: collapse;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    .route-table th, .route-table td { padding: 14px 16px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
-    .route-table th { background: #f1f5f9; font-size: 13px; color: var(--muted); }
-    .route-table tr:last-child td { border-bottom: 0; }
-    .route-table a { color: var(--blue); font-weight: 800; text-decoration: none; }
-    .route-table a:hover { text-decoration: underline; }
-
+    .note { margin-top: 14px; color: var(--muted); line-height: 1.6; }
     @media (max-width: 900px) {
       .hero { grid-template-columns: 1fr; }
       .grid { grid-template-columns: 1fr; }
       .section-head { display: block; }
-      .nav { justify-content: flex-start; }
+      .nav, .language-switch { justify-content: flex-start; }
+      .route-table { display: block; overflow-x: auto; }
     }
   </style>
 </head>
 <body>
   ${nav}
   <main>
+    ${languageSwitch}
     <section class="hero">
-      <div>
-        <h1>一个域名，所有加速入口。</h1>
-        <p class="lead">DevBox Workers 的推荐玩法是单域名路径路由：网页可直接生成命令，命令行可直接复制使用，包管理器和下载工具可以配置为长期加速入口。</p>
+      <div class="hero-copy">
+        <span class="eyebrow">${escapeHtml(copy.eyebrow)}</span>
+        <h1>${escapeHtml(copy.title)}</h1>
+        <p class="lead">${escapeHtml(copy.lead)}</p>
       </div>
       <div class="hero-panel">
-        <div class="metric"><span>Primary domain</span><strong>${urls.box}</strong></div>
-        <div class="metric"><span>Runtime</span><strong>Cloudflare Workers / Vercel Functions</strong></div>
-        <div class="metric"><span>Health</span><strong>${urls.box}/healthz</strong></div>
+        <div class="metric"><span>${escapeHtml(copy.primaryDomain)}</span><strong>${escapeHtml(urls.box)}</strong></div>
+        <div class="metric"><span>${escapeHtml(copy.runtime)}</span><strong>Cloudflare Workers / Vercel Functions</strong></div>
+        <div class="metric"><span>${escapeHtml(copy.health)}</span><strong>${escapeHtml(urls.box)}/healthz</strong></div>
       </div>
     </section>
 
     <section class="band">
       <div class="section-head">
-        <h2>网页怎么用</h2>
-        <p class="hint">打开对应路径，输入包名、模型名、仓库名、镜像名或 URL，页面会生成可复制命令。</p>
+        <h2>${escapeHtml(copy.webTitle)}</h2>
+        <p class="hint">${escapeHtml(copy.webHint)}</p>
       </div>
       <div class="grid">
-        <div class="card"><span class="pill">Portal</span><h3>入口面板</h3><p>从 ${urls.box} 进入所有工具，快速查看用法和复制命令。</p></div>
-        <div class="card"><span class="pill green">Path mode</span><h3>统一路径</h3><p>所有工具都在同一个域名下，用路径区分服务，适合 Vercel 和单 Worker 部署。</p></div>
-        <div class="card"><span class="pill violet">CLI ready</span><h3>命令行友好</h3><p>pip、huggingface-cli、git、docker、wget、curl 都能直接使用生成的加速地址。</p></div>
+        ${infoCard("Portal", copy.portalTitle, copy.portalText)}
+        ${infoCard("Path mode", copy.pathTitle, copy.pathText, "green")}
+        ${infoCard("CLI ready", copy.cliTitle, copy.cliText, "violet")}
       </div>
     </section>
 
     <section class="band">
       <div class="section-head">
-        <h2>路径地图</h2>
-        <p class="hint">这是当前部署环境下的实际入口。</p>
+        <h2>${escapeHtml(copy.routeTitle)}</h2>
+        <p class="hint">${escapeHtml(copy.routeHint)}</p>
       </div>
       <table class="route-table">
-        <thead><tr><th>资源</th><th>入口</th><th>说明</th></tr></thead>
+        <thead><tr><th>${escapeHtml(copy.thStatus)}</th><th>${escapeHtml(copy.thService)}</th><th>${escapeHtml(copy.thEntry)}</th><th>${escapeHtml(copy.thUsage)}</th></tr></thead>
         <tbody>
-          <tr><td><span class="pill green">Stable</span><br>PyPI / PyTorch</td><td><a href="${urls.pypi}">${urls.pypi}</a></td><td>Python 包、PyPI simple index、PyTorch wheel。</td></tr>
-          <tr><td><span class="pill green">Stable</span><br>Hugging Face</td><td><a href="${urls.hf}">${urls.hf}</a></td><td>模型、数据集、LFS 大文件下载。</td></tr>
-          <tr><td><span class="pill green">Stable</span><br>GitHub</td><td><a href="${urls.github}">${urls.github}</a></td><td>Git clone、Raw、Release 文件。</td></tr>
-          <tr><td><span class="pill green">Stable</span><br>Docker</td><td><a href="${urls.docker}">${urls.docker}</a></td><td>网页生成镜像命令；Registry API 使用当前域名的 /v2。</td></tr>
-          <tr><td><span class="pill green">Stable</span><br>Linux Mirrors</td><td><a href="${urls.mirrors}">${urls.mirrors}</a></td><td>APT、YUM、DNF、Pacman、wget、curl。</td></tr>
-          <tr><td><span class="pill green">Stable</span><br>Universal Proxy</td><td><a href="${urls.proxy}">${urls.proxy}</a></td><td>任意 HTTP/HTTPS 文件下载代理。</td></tr>
-          <tr><td><span class="pill orange">Test</span><br>npm Registry</td><td><a href="${urls.npm}">${urls.npm}</a></td><td>npm、pnpm、yarn metadata 和 tarball 下载。</td></tr>
-          <tr><td><span class="pill orange">Test</span><br>Go Modules</td><td><a href="${urls.go}">${urls.go}</a></td><td>GOPROXY module metadata、mod 和 zip 文件。</td></tr>
-          <tr><td><span class="pill orange">Test</span><br>Maven / Gradle</td><td><a href="${urls.maven}">${urls.maven}</a></td><td>Maven Central、Google Maven、Gradle Plugin Portal、JitPack。</td></tr>
-          <tr><td><span class="pill orange">Test</span><br>crates.io Sparse</td><td><a href="${urls.crates}">${urls.crates}</a></td><td>Cargo sparse index 和 crate package 下载。</td></tr>
-          <tr><td><span class="pill orange">Test</span><br>Downloads</td><td><a href="${urls.downloads}">${urls.downloads}</a></td><td>Runtime、Open VSX、SourceForge、GitLab/Gitea 和直接 URL 文件。</td></tr>
+          ${SERVICES.map(([status, name, key, descriptions]) => routeRow(status, copy, name, urls[key], descriptions[lang] ?? descriptions.en)).join("")}
         </tbody>
       </table>
+      <p class="note">${escapeHtml(copy.testNote)}</p>
     </section>
 
     <section class="band">
       <div class="section-head">
-        <h2>命令行怎么用</h2>
-        <p class="hint">下面命令会根据当前域名生成，复制即可改包名或资源名使用。</p>
+        <h2>${escapeHtml(copy.commandTitle)}</h2>
+        <p class="hint">${escapeHtml(copy.commandHint)}</p>
       </div>
       <div class="commands">
-        ${commandBlock("PyPI", "pip install numpy -i " + urls.pypi + "/simple/")}
-        ${commandBlock("PyTorch", "pip install torch torchvision --index-url " + urls.pypi + "/pytorch/cu118")}
-        ${commandBlock("Hugging Face", "export HF_ENDPOINT=" + urls.hf + "\nhuggingface-cli download gpt2")}
-        ${commandBlock("GitHub", "git clone " + urls.github + "/tianrking/box-tools.git")}
-        ${commandBlock("Docker", "docker pull " + dockerHost + "/library/nginx:latest")}
-        ${commandBlock("Docker daemon.json", "{\n  \"registry-mirrors\": [\n    \"https://" + dockerHost + "\"\n  ]\n}")}
-        ${commandBlock("APT source", "deb " + urls.mirrors + "/http://archive.ubuntu.com/ubuntu/ jammy main restricted universe multiverse")}
-        ${commandBlock("Universal file proxy", "curl -L -O \"" + proxyDownloadBase + "/https://example.com/file.zip\"")}
-        ${commandBlock("npm", "npm install lodash --registry=" + urls.npm + "/")}
-        ${commandBlock("Go modules", "go env -w GOPROXY=" + urls.go + ",direct")}
-        ${commandBlock("Maven / Gradle", "maven { url = uri(\"" + urls.maven + "/maven-central\") }")}
-        ${commandBlock("crates.io", "[source.crates-io]\nreplace-with = \"devbox\"\n\n[source.devbox]\nregistry = \"sparse+" + urls.crates + "/\"")}
-        ${commandBlock("Runtime downloads", "curl -L -O \"" + urls.downloads + "/node/v22.11.0/node-v22.11.0-x64.msi\"")}
+        ${commandBlock("PyPI", "pip install numpy -i " + urls.pypi + "/simple/", copy)}
+        ${commandBlock("PyTorch", "pip install torch torchvision --index-url " + urls.pypi + "/pytorch/cu118", copy)}
+        ${commandBlock("Hugging Face", "export HF_ENDPOINT=" + urls.hf + "\nhuggingface-cli download gpt2", copy)}
+        ${commandBlock("GitHub", "git clone " + urls.github + "/tianrking/box-tools.git", copy)}
+        ${commandBlock("Docker", "docker pull " + dockerHost + "/library/nginx:latest", copy)}
+        ${commandBlock("Docker daemon.json", "{\n  \"registry-mirrors\": [\n    \"https://" + dockerHost + "\"\n  ]\n}", copy)}
+        ${commandBlock("APT source", "deb " + urls.mirrors + "/http://archive.ubuntu.com/ubuntu/ jammy main restricted universe multiverse", copy)}
+        ${commandBlock("Universal Proxy", "curl -L -O \"" + proxyDownloadBase + "/https://example.com/file.zip\"", copy)}
+        ${commandBlock("npm", "npm install lodash --registry=" + urls.npm + "/", copy)}
+        ${commandBlock("Go Modules", "go env -w GOPROXY=" + urls.go + ",direct", copy)}
+        ${commandBlock("Maven / Gradle", "maven { url = uri(\"" + urls.maven + "/maven-central\") }", copy)}
+        ${commandBlock("crates.io", "[source.crates-io]\nreplace-with = \"devbox\"\n\n[source.devbox]\nregistry = \"sparse+" + urls.crates + "/\"", copy)}
+        ${commandBlock("Downloads", "curl -L -O \"" + urls.downloads + "/node/v22.11.0/node-v22.11.0-x64.msi\"", copy)}
       </div>
     </section>
 
     <section class="band">
       <div class="section-head">
-        <h2>配置和部署</h2>
-        <p class="hint">用户可以直接使用网页，也可以把路径写进工具配置里长期使用。</p>
+        <h2>${escapeHtml(copy.deployTitle)}</h2>
+        <p class="hint">${escapeHtml(copy.deployHint)}</p>
       </div>
       <div class="grid">
-        <div class="card"><span class="pill orange">Cloudflare</span><h3>先部署，再绑定域名</h3><p><code>wrangler.toml</code> 默认适合一键部署到任意 Cloudflare 账户。绑定 ${PROJECT.primaryHost} 时，可参考 <code>wrangler.custom-domain.example.toml</code>。</p></div>
-        <div class="card"><span class="pill dark">Vercel</span><h3>一键部署</h3><p><code>vercel.json</code> 会把所有路径转给 <code>api/index.js</code>，同一套路径玩法可直接复用。</p></div>
-        <div class="card"><span class="pill pink">High availability</span><h3>上线前验证</h3><p>运行 <code>npm run verify</code>，它会检查 JS、页面导航、Vercel 入口、Docker API 路由和高危依赖审计。</p></div>
+        ${infoCard("Cloudflare", copy.cloudflareTitle, copy.cloudflareText, "orange")}
+        ${infoCard("Vercel", copy.vercelTitle, copy.vercelText, "dark")}
+        ${infoCard("Verify", copy.verifyTitle, copy.verifyText, "pink")}
       </div>
     </section>
   </main>
@@ -258,13 +473,17 @@ function htmlPage(request) {
 </html>`;
 }
 
-function commandBlock(title, command) {
-  return `<div class="command"><div class="command-header">${title}<span>copy and edit</span></div><pre><code>${escapeHtml(command)}</code></pre></div>`;
+function infoCard(label, title, text, color = "") {
+  const colorClass = color ? ` ${color}` : "";
+  return `<div class="card"><span class="pill${colorClass}">${escapeHtml(label)}</span><h3>${escapeHtml(title)}</h3><p>${escapeHtml(text)}</p></div>`;
 }
 
-function escapeHtml(value) {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;");
+function routeRow(status, copy, name, url, description) {
+  const label = status === "stable" ? copy.stable : copy.test;
+  const color = status === "stable" ? "green" : "orange";
+  return `<tr><td><span class="pill ${color}">${escapeHtml(label)}</span></td><td>${escapeHtml(name)}</td><td><a href="${escapeHtml(url)}">${escapeHtml(url)}</a></td><td>${escapeHtml(description)}</td></tr>`;
+}
+
+function commandBlock(title, command, copy) {
+  return `<div class="command"><div class="command-header">${escapeHtml(title)}<span>${escapeHtml(copy.copyHint)}</span></div><pre><code>${escapeHtml(command)}</code></pre></div>`;
 }

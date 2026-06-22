@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="README.zh-CN.md">中文</a> | <strong>English</strong>
+  <strong>English</strong> | <a href="README.es.md">Español</a> | <a href="README.zh-CN.md">中文</a>
 </p>
 
 <h1 align="center">DevBox Workers</h1>
@@ -67,7 +67,7 @@ Keywords: Cloudflare Workers proxy, Vercel Functions proxy, PyPI mirror accelera
 | Status | Service | Single-domain route | What it accelerates |
 | --- | --- | --- | --- |
 | Stable | DevBox Portal | `/` or `/box` | Visual dashboard and usage snippets for every tool |
-| Stable | Help | `/help` | Route map, web usage, CLI recipes, and configuration guide |
+| Stable | Help | `/help` | Route map, web usage, CLI recipes, and configuration guide in English, Spanish, and Chinese |
 | Stable | PyPI / PyTorch | `/pypi` | PyPI simple index, package files, and PyTorch wheel downloads |
 | Stable | Hugging Face | `/hf` | Hugging Face API, model files, datasets, and LFS downloads |
 | Stable | GitHub | `/github` | Git clone, raw files, release assets, and GitHub pages |
@@ -239,6 +239,7 @@ scripts/check-syntax.mjs  Cross-platform JavaScript syntax checker
 scripts/smoke-vercel.mjs  Vercel runtime smoke test
 src/config.js             Project metadata, service registry, health paths
 src/html.js               HTML rewrite fallback for non-Cloudflare runtimes
+src/i18n.js               Language detection, language switch links, and localized URLs
 src/index.js              Host/path router and health endpoint
 src/proxy-utils.js        Shared CORS, redirect, header, and proxy helpers
 src/tools/*.js            Individual tool implementations

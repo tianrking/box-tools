@@ -1,4 +1,5 @@
 import { HELP_DEFINITION, PROJECT, TOOL_DEFINITIONS } from "./config.js";
+import { getLanguage, preserveLanguageUrl } from "./i18n.js";
 
 const TOOL_BY_KEY = new Map(TOOL_DEFINITIONS.map((tool) => [tool.key, tool]));
 const KNOWN_HOSTS = new Set(TOOL_DEFINITIONS.map((tool) => tool.host));
@@ -38,9 +39,11 @@ export function getDockerRegistryHost(request) {
 }
 
 export function renderToolNav(request, activeKey) {
+  const lang = getLanguage(request);
   const links = NAV_ITEMS.map((item) => {
     const active = item.key === activeKey ? ' class="active"' : "";
-    return `<a href="${getToolBaseUrl(request, item.key)}"${active}>${NAV_LABELS[item.key] ?? item.title}</a>`;
+    const href = preserveLanguageUrl(getToolBaseUrl(request, item.key), lang);
+    return `<a href="${href}"${active}>${NAV_LABELS[item.key] ?? item.title}</a>`;
   });
 
   return `<nav class="nav" aria-label="Tool navigation">${links.join("")}</nav>`;

@@ -30,7 +30,7 @@ const PAGE_IDENTITY = new Map([
   ["maven", "Maven / Gradle Proxy"],
   ["crates", "crates.io Sparse Proxy"],
   ["downloads", "Runtime & Release Downloads"],
-  ["help", "一个域名，所有加速入口。"],
+  ["help", "One domain. Every accelerator."],
 ]);
 
 const checks = [
@@ -75,6 +75,30 @@ const checks = [
       return response.status === 200 && payload.dl === `${BASE_URL}/crates/api/v1/crates`;
     },
   },
+  {
+    name: "help default english",
+    request: new Request(`${BASE_URL}/help`),
+    assert: async (response) => {
+      const html = await response.text();
+      return response.status === 200 && html.includes("One domain. Every accelerator.") && html.includes('lang="en"');
+    },
+  },
+  {
+    name: "help spanish language",
+    request: new Request(`${BASE_URL}/help?lang=es`),
+    assert: async (response) => {
+      const html = await response.text();
+      return response.status === 200 && html.includes("Un dominio. Todos los aceleradores.") && html.includes('lang="es"') && html.includes("/pypi?lang=es");
+    },
+  },
+  {
+    name: "help chinese language",
+    request: new Request(`${BASE_URL}/help?lang=zh`),
+    assert: async (response) => {
+      const html = await response.text();
+      return response.status === 200 && html.includes("一个域名，所有加速入口。") && html.includes('lang="zh-CN"') && html.includes("/pypi?lang=zh");
+    },
+  },
 ];
 
 for (const check of checks) {
@@ -89,7 +113,7 @@ for (const tool of TOOLS) {
   const response = await api.default.fetch(new Request(`${BASE_URL}${tool.path}`));
   const html = await response.text();
   assertHtmlResponse(response, html, `${tool.key} page`);
-  assertNavLinks(html, TOOLS.map((item) => `${BASE_URL}${item.path}`), `${tool.key} path nav`);
+  assertNavLinks(html, TOOLS.map((item) => urlFor(BASE_URL, item.path)), `${tool.key} path nav`);
   assertPageIdentity(html, tool.key, `${tool.key} path page`);
   console.log(`ok ${tool.key} path page nav`);
 }
@@ -98,7 +122,7 @@ for (const tool of TOOLS) {
   const response = await api.default.fetch(new Request(`https://box.w0x7ce.eu${tool.path}`));
   const html = await response.text();
   assertHtmlResponse(response, html, `${tool.key} primary-domain path page`);
-  assertNavLinks(html, TOOLS.map((item) => `https://box.w0x7ce.eu${item.path}`), `${tool.key} primary-domain nav`);
+  assertNavLinks(html, TOOLS.map((item) => urlFor("https://box.w0x7ce.eu", item.path)), `${tool.key} primary-domain nav`);
   assertPageIdentity(html, tool.key, `${tool.key} primary-domain path page`);
   console.log(`ok ${tool.key} primary-domain path page nav`);
 }
@@ -108,7 +132,7 @@ for (const tool of TOOLS) {
   const response = await api.default.fetch(new Request(hostUrl));
   const html = await response.text();
   assertHtmlResponse(response, html, `${tool.key} host page`);
-  assertNavLinks(html, TOOLS.map((item) => `https://box.w0x7ce.eu${item.path}`), `${tool.key} host nav`);
+  assertNavLinks(html, TOOLS.map((item) => urlFor("https://box.w0x7ce.eu", item.path)), `${tool.key} host nav`);
   assertPageIdentity(html, tool.key, `${tool.key} host page`);
   console.log(`ok ${tool.key} host page nav`);
 }
@@ -138,4 +162,8 @@ function assertPageIdentity(html, key, name) {
   if (marker && !html.includes(marker)) {
     throw new Error(`${name} is missing identity marker: ${marker}`);
   }
+}
+
+function urlFor(origin, path) {
+  return new URL(path || "/", origin).toString();
 }
