@@ -1,7 +1,35 @@
+import { getLanguage, LANGUAGES } from "../i18n.js";
 import { getToolBaseUrl, renderToolNav } from "../navigation.js";
 import { corsPreflightResponse, escapeHtml, htmlResponse, joinUrlPath, proxyRequest } from "../proxy-utils.js";
 
 const UPSTREAM = "https://proxy.golang.org";
+
+const COPY = {
+  en: {
+    lead: "GOPROXY-compatible module list, version metadata, .mod files, and .zip downloads.",
+    temporary: "Temporary use",
+    persistent: "Persistent config",
+    restore: "Restore default",
+    mapping: "Example mapping",
+    note: "Status: Test. Module proxy paths are available; keep Go's default sumdb settings or your own trusted configuration.",
+  },
+  es: {
+    lead: "Compatible con GOPROXY: module list, metadata de version, archivos .mod y .zip.",
+    temporary: "Uso temporal",
+    persistent: "Configuracion persistente",
+    restore: "Restaurar valor predeterminado",
+    mapping: "Ejemplo de mapeo",
+    note: "Estado: Test. Las rutas de modulo estan disponibles; conserva sumdb por defecto o tu configuracion confiable.",
+  },
+  zh: {
+    lead: "兼容 Go module proxy 协议，代理 module list、version metadata、mod 文件和 zip 包下载。",
+    temporary: "临时使用",
+    persistent: "长期配置",
+    restore: "恢复默认",
+    mapping: "映射示例",
+    note: "状态：Test。模块代理路径已可用；sumdb 仍建议使用 Go 默认设置或你自己的可信配置。",
+  },
+};
 
 export default {
   async fetch(request) {
@@ -25,9 +53,11 @@ export default {
 };
 
 function renderPage(request, baseUrl) {
+  const lang = getLanguage(request);
+  const copy = COPY[lang] ?? COPY.en;
   const nav = renderToolNav(request, "go");
   return `<!doctype html>
-<html lang="zh-CN">
+<html lang="${LANGUAGES[lang].htmlLang}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -40,15 +70,15 @@ function renderPage(request, baseUrl) {
     <section class="hero">
       <span class="status">Test accelerator</span>
       <h1>Go Module Proxy</h1>
-      <p>兼容 Go module proxy 协议，代理 module list、version metadata、mod 文件和 zip 包下载。</p>
+      <p>${escapeHtml(copy.lead)}</p>
     </section>
     <section class="grid">
-      ${commandCard("临时使用", `GOPROXY=${baseUrl},direct go install golang.org/x/tools/cmd/stringer@latest`)}
-      ${commandCard("长期配置", `go env -w GOPROXY=${baseUrl},direct`)}
-      ${commandCard("恢复默认", "go env -w GOPROXY=https://proxy.golang.org,direct")}
-      ${commandCard("Example mapping", `Original:\nGOPROXY=https://proxy.golang.org,direct go install golang.org/x/tools/cmd/stringer@latest\n\nAccelerated:\nGOPROXY=${baseUrl},direct go install golang.org/x/tools/cmd/stringer@latest`)}
+      ${commandCard(copy.temporary, `GOPROXY=${baseUrl},direct go install golang.org/x/tools/cmd/stringer@latest`)}
+      ${commandCard(copy.persistent, `go env -w GOPROXY=${baseUrl},direct`)}
+      ${commandCard(copy.restore, "go env -w GOPROXY=https://proxy.golang.org,direct")}
+      ${commandCard(copy.mapping, `Original:\nGOPROXY=https://proxy.golang.org,direct go install golang.org/x/tools/cmd/stringer@latest\n\nAccelerated:\nGOPROXY=${baseUrl},direct go install golang.org/x/tools/cmd/stringer@latest`)}
     </section>
-    <p class="note">状态：Test。模块代理路径已可用；sumdb 仍建议使用 Go 默认设置或你自己的可信配置。</p>
+    <p class="note">${escapeHtml(copy.note)}</p>
   </main>
 </body>
 </html>`;

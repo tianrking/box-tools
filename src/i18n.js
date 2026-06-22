@@ -67,7 +67,16 @@ export function renderClientI18nScript(currentLang) {
   function translate(value) {
     if (!value) return value;
     var trimmed = value.trim().replace(/\\s+/g, " ");
-    return dictionary[trimmed] || value;
+    if (dictionary[trimmed]) return dictionary[trimmed];
+    var translated = value;
+    Object.keys(dictionary)
+      .sort(function(a, b) { return b.length - a.length; })
+      .forEach(function(key) {
+        if (key && translated.indexOf(key) !== -1) {
+          translated = translated.split(key).join(dictionary[key]);
+        }
+      });
+    return translated;
   }
   function applyTranslations() {
     document.querySelectorAll("input[placeholder], textarea[placeholder]").forEach(function(element) {
@@ -83,11 +92,11 @@ export function renderClientI18nScript(currentLang) {
       if (!parent || skipTags.has(parent.tagName) || parent.closest("script,style,code,pre,svg")) return;
       var text = node.nodeValue;
       var trimmed = text.trim().replace(/\\s+/g, " ");
-      var replacement = dictionary[trimmed];
+      var replacement = dictionary[trimmed] || translate(text);
       if (!replacement) return;
       var leading = (text.match(/^\\s*/) || [""])[0];
       var trailing = (text.match(/\\s*$/) || [""])[0];
-      node.nodeValue = leading + replacement + trailing;
+      node.nodeValue = replacement === text ? text : leading + replacement.trim() + trailing;
     });
   }
   if (document.readyState === "loading") {
@@ -108,6 +117,29 @@ const UI_TRANSLATIONS = {
     "Original": "Original",
     "Accelerated": "Accelerated",
     "Example mapping": "Example mapping",
+    "映射示例": "Example mapping",
+    "输入": "Enter",
+    "自动生成命令": "to generate the command",
+    "加速标准 PyPI 包": "accelerates standard PyPI packages",
+    "加速 PyTorch/CUDA 大文件": "accelerates PyTorch and CUDA wheels",
+    "💡 推荐使用官方高速下载器 (多线程/断点续传):": "Recommended official fast downloader (multi-threaded and resumable):",
+    "默认为 Docker Hub，支持": "Defaults to Docker Hub and supports",
+    "自动补全": "auto-complete",
+    "支持": "Supports",
+    "等前缀路由": "and other registry prefixes",
+    "WGET 标准下载 CURL -O 保存文件": "WGET standard download; CURL -O saves the file",
+    "临时使用": "Temporary use",
+    "长期配置": "Persistent config",
+    "恢复默认": "Restore default",
+    "单次环境变量": "One-shot environment variable",
+    "测试 index": "Test index",
+    "Python 依赖包与 PyTorch 大模型极速下载，支持自动匹配 CUDA 版本。": "Fast Python package and PyTorch wheel downloads with automatic CUDA channel guidance.",
+    "AI 模型权重与数据集下载加速，支持 Token 鉴权与 LFS 大文件多线程传输。": "Accelerate AI model weights and datasets, including token-authenticated LFS files.",
+    "Git Clone 仓库克隆、Releases 发布文件及 Raw 文件加速。": "Accelerate git clone, release assets, and raw GitHub files.",
+    "Docker Hub, Quay, GCR, K8s 等容器镜像仓库加速，解决拉取超时。": "Accelerate Docker Hub, Quay, GCR, Kubernetes, and other image registries.",
+    "APT (Ubuntu/Debian), YUM (CentOS), DNF 等系统源透传加速。": "Pass-through acceleration for APT, YUM, DNF, and other Linux repository sources.",
+    "万能文件下载器，自动修正文件名，解决跨域与防盗链限制。": "Universal file downloader with filename handling and edge forwarding.",
+    "单域名路径玩法、网页入口、命令行用法、工具配置和部署说明都在这里。": "Single-domain routing, web entry points, CLI usage, tool configuration, and deployment notes.",
     "Repo 地址 (支持简写)": "Repository address (short form supported)",
     "输入 vercel/next.js 自动生成命令": "Enter vercel/next.js to generate the command.",
     "链接可直接访问，支持 Releases / Raw": "Links can be opened directly, including Releases and Raw files.",
@@ -132,7 +164,6 @@ const UI_TRANSLATIONS = {
     "下载和 metadata 代理已可用；Gradle plugin marker 与私有仓库认证建议先做项目级验证。": "Downloads and metadata proxying are available; validate Gradle plugin markers and private repository auth per project.",
     "代理 crates.io sparse index 和 crate 包下载，适合 Rust / Cargo 项目依赖拉取。": "Proxy the crates.io sparse index and crate downloads for Rust / Cargo dependency fetching.",
     "Sparse index 与 crate download 已代理；publish、yank、token API 不在当前稳定范围。": "Sparse index and crate downloads are proxied; publish, yank, and token APIs are outside the current stable scope.",
-    "推荐使用官方高速下载器 (多线程/断点续传):": "Recommended official fast downloader (multi-threaded and resumable):",
     "Paste file URL (e.g. https://nodejs.org/dist/v22.11.0/node-v22.11.0-x64.msi)": "Paste file URL (e.g. https://nodejs.org/dist/v22.11.0/node-v22.11.0-x64.msi)",
     "例如: torch 或 numpy": "e.g. torch or numpy",
     "例如: nginx:latest 或 quay.io/coreos/etcd": "e.g. nginx:latest or quay.io/coreos/etcd",
@@ -149,6 +180,29 @@ const UI_TRANSLATIONS = {
     "Accelerated": "Acelerado",
     "加速地址": "Acelerado",
     "Example mapping": "Ejemplo de mapeo",
+    "映射示例": "Ejemplo de mapeo",
+    "输入": "Escribe",
+    "自动生成命令": "para generar el comando",
+    "加速标准 PyPI 包": "acelera paquetes PyPI estandar",
+    "加速 PyTorch/CUDA 大文件": "acelera wheels grandes de PyTorch/CUDA",
+    "💡 推荐使用官方高速下载器 (多线程/断点续传):": "Recomendado: descargador oficial rapido (multi-hilo y reanudable):",
+    "默认为 Docker Hub，支持": "Usa Docker Hub por defecto y admite",
+    "自动补全": "autocompletado",
+    "支持": "Admite",
+    "等前缀路由": "y otros prefijos de registro",
+    "WGET 标准下载 CURL -O 保存文件": "WGET descarga estandar; CURL -O guarda el archivo",
+    "临时使用": "Uso temporal",
+    "长期配置": "Configuracion persistente",
+    "恢复默认": "Restaurar valor predeterminado",
+    "单次环境变量": "Variable de entorno puntual",
+    "测试 index": "Probar index",
+    "Python 依赖包与 PyTorch 大模型极速下载，支持自动匹配 CUDA 版本。": "Descargas rapidas de paquetes Python y wheels PyTorch con guia automatica de CUDA.",
+    "AI 模型权重与数据集下载加速，支持 Token 鉴权与 LFS 大文件多线程传输。": "Acelera pesos de modelos y datasets, incluidos archivos LFS con token.",
+    "Git Clone 仓库克隆、Releases 发布文件及 Raw 文件加速。": "Acelera git clone, release assets y archivos raw de GitHub.",
+    "Docker Hub, Quay, GCR, K8s 等容器镜像仓库加速，解决拉取超时。": "Acelera Docker Hub, Quay, GCR, Kubernetes y otros registros de imagenes.",
+    "APT (Ubuntu/Debian), YUM (CentOS), DNF 等系统源透传加速。": "Aceleracion passthrough para APT, YUM, DNF y otros repositorios Linux.",
+    "万能文件下载器，自动修正文件名，解决跨域与防盗链限制。": "Descargador universal con manejo de nombres y reenvio edge.",
+    "单域名路径玩法、网页入口、命令行用法、工具配置和部署说明都在这里。": "Rutas de dominio unico, entrada web, CLI, configuracion y despliegue.",
     "Repo 地址 (支持简写)": "Repositorio (admite forma corta)",
     "输入 vercel/next.js 自动生成命令": "Escribe vercel/next.js para generar el comando.",
     "链接可直接访问，支持 Releases / Raw": "Los enlaces se pueden abrir directamente, incluidos Releases y Raw.",
@@ -173,7 +227,6 @@ const UI_TRANSLATIONS = {
     "下载和 metadata 代理已可用；Gradle plugin marker 与私有仓库认证建议先做项目级验证。": "Descargas y metadata estan disponibles; valida plugin markers y repos privados por proyecto.",
     "代理 crates.io sparse index 和 crate 包下载，适合 Rust / Cargo 项目依赖拉取。": "Proxy del sparse index de crates.io y descargas .crate para Rust / Cargo.",
     "Sparse index 与 crate download 已代理；publish、yank、token API 不在当前稳定范围。": "Sparse index y descargas .crate estan proxied; publish, yank y token API quedan fuera del alcance estable.",
-    "推荐使用官方高速下载器 (多线程/断点续传):": "Recomendado: descargador oficial rapido (multi-hilo y reanudable):",
     "Paste file URL (e.g. https://nodejs.org/dist/v22.11.0/node-v22.11.0-x64.msi)": "Pega una URL de archivo (ej. https://nodejs.org/dist/v22.11.0/node-v22.11.0-x64.msi)",
     "例如: torch 或 numpy": "ej. torch o numpy",
     "例如: nginx:latest 或 quay.io/coreos/etcd": "ej. nginx:latest o quay.io/coreos/etcd",

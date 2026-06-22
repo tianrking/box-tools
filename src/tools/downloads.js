@@ -1,3 +1,4 @@
+import { getLanguage, LANGUAGES } from "../i18n.js";
 import { getToolBaseUrl, renderToolNav } from "../navigation.js";
 import { corsPreflightResponse, escapeHtml, htmlResponse, joinUrlPath, parseTargetUrlFromPath, proxyRequest, textResponse } from "../proxy-utils.js";
 
@@ -12,6 +13,24 @@ const SOURCES = {
   gitea: "https://gitea.com",
   cmake: "https://github.com/Kitware/CMake/releases/download",
   "git-for-windows": "https://github.com/git-for-windows/git/releases/download",
+};
+
+const COPY = {
+  en: {
+    lead: "Proxy common runtimes, developer tools, Open VSX, SourceForge, GitLab/Gitea release files, and direct HTTP URLs.",
+    mapping: "Example mapping",
+    note: "Status: Test. Good for binary installers and release assets; authenticated or hotlink-protected upstreams still follow the original site's rules.",
+  },
+  es: {
+    lead: "Proxy para runtimes, herramientas, Open VSX, SourceForge, releases de GitLab/Gitea y URLs HTTP directas.",
+    mapping: "Ejemplo de mapeo",
+    note: "Estado: Test. Adecuado para instaladores binarios y release assets; los origenes con login o proteccion anti-hotlink siguen sus reglas.",
+  },
+  zh: {
+    lead: "统一代理常见运行时、开发工具、Open VSX、SourceForge、GitLab/Gitea release 文件，也支持直接粘贴完整 HTTP URL。",
+    mapping: "映射示例",
+    note: "状态：Test。适合二进制安装包和 release asset 下载；带登录态或反盗链的上游仍需要按原站规则处理。",
+  },
 };
 
 export default {
@@ -50,9 +69,11 @@ export default {
 };
 
 function renderPage(request, baseUrl) {
+  const lang = getLanguage(request);
+  const copy = COPY[lang] ?? COPY.en;
   const nav = renderToolNav(request, "downloads");
   return `<!doctype html>
-<html lang="zh-CN">
+<html lang="${LANGUAGES[lang].htmlLang}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -65,7 +86,7 @@ function renderPage(request, baseUrl) {
     <section class="hero">
       <span class="status">Test accelerator</span>
       <h1>Runtime & Release Downloads</h1>
-      <p>统一代理常见运行时、开发工具、Open VSX、SourceForge、GitLab/Gitea release 文件，也支持直接粘贴完整 HTTP URL。</p>
+      <p>${escapeHtml(copy.lead)}</p>
     </section>
     <section class="grid">
       ${commandCard("Node.js", `${baseUrl}/node/v22.11.0/node-v22.11.0-x64.msi`)}
@@ -74,9 +95,9 @@ function renderPage(request, baseUrl) {
       ${commandCard("Rustup", `${baseUrl}/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe`)}
       ${commandCard("Open VSX", `${baseUrl}/openvsx/api/redhat/java/latest/file/redhat.java.vsix`)}
       ${commandCard("Direct URL", `${baseUrl}/https://nodejs.org/dist/v22.11.0/node-v22.11.0-x64.msi`)}
-      ${commandCard("Example mapping", `Original:\nhttps://nodejs.org/dist/v22.11.0/node-v22.11.0-x64.msi\n\nAccelerated:\n${baseUrl}/https://nodejs.org/dist/v22.11.0/node-v22.11.0-x64.msi`)}
+      ${commandCard(copy.mapping, `Original:\nhttps://nodejs.org/dist/v22.11.0/node-v22.11.0-x64.msi\n\nAccelerated:\n${baseUrl}/https://nodejs.org/dist/v22.11.0/node-v22.11.0-x64.msi`)}
     </section>
-    <p class="note">状态：Test。适合二进制安装包和 release asset 下载；带登录态或反盗链的上游仍需要按原站规则处理。</p>
+    <p class="note">${escapeHtml(copy.note)}</p>
   </main>
 </body>
 </html>`;

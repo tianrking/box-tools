@@ -1,3 +1,4 @@
+import { getLanguage, LANGUAGES } from "../i18n.js";
 import { getToolBaseUrl, renderToolNav } from "../navigation.js";
 
 /**
@@ -15,6 +16,48 @@ const PREFLIGHT_INIT = {
 };
 
 const BLOCK_UA = ['netcraft', 'baiduspider', 'bingbot', 'sogou', '360spider'];
+
+const COPY = {
+    en: {
+        subtitle: "Universal File Fetcher & Header Fixer",
+        placeholder: "Paste file URL (e.g. https://nodejs.org/dist/v22.11.0/node-v22.11.0-x64.msi)",
+        original: "Original",
+        accelerated: "Accelerated",
+        browserDownload: "Browser Download",
+        terminalCommands: "Terminal Commands",
+        downloadNow: "Download Now",
+        waiting: "Waiting...",
+        copy: "Copy",
+        copied: "Copied!",
+        tips: '<span class="badge">WGET</span> standard download <span class="badge">CURL</span> saves files with <code>-O</code>',
+    },
+    es: {
+        subtitle: "Descargador universal con ajuste de headers",
+        placeholder: "Pega una URL de archivo (ej. https://nodejs.org/dist/v22.11.0/node-v22.11.0-x64.msi)",
+        original: "Original",
+        accelerated: "Acelerado",
+        browserDownload: "Descarga en navegador",
+        terminalCommands: "Comandos de terminal",
+        downloadNow: "Descargar ahora",
+        waiting: "Esperando...",
+        copy: "Copiar",
+        copied: "Copiado!",
+        tips: '<span class="badge">WGET</span> descarga estandar <span class="badge">CURL</span> guarda archivos con <code>-O</code>',
+    },
+    zh: {
+        subtitle: "万能文件下载与请求头修复",
+        placeholder: "粘贴文件 URL（如 https://nodejs.org/dist/v22.11.0/node-v22.11.0-x64.msi）",
+        original: "原始地址",
+        accelerated: "加速地址",
+        browserDownload: "浏览器下载",
+        terminalCommands: "命令行",
+        downloadNow: "立即下载",
+        waiting: "等待输入...",
+        copy: "复制",
+        copied: "已复制!",
+        tips: '<span class="badge">WGET</span> 标准下载 <span class="badge">CURL</span> 使用 <code>-O</code> 保存文件',
+    },
+};
 
 export default {
     async fetch(request, env, ctx) {
@@ -112,12 +155,14 @@ function getFilenameFromUrl(urlStr, contentType) {
 
 // ---------------- UI 部分 ----------------
 function htmlPage(request) {
+    const lang = getLanguage(request);
+    const copy = COPY[lang] ?? COPY.en;
     const baseUrl = getToolBaseUrl(request, "proxy");
     const downloadBaseUrl = baseUrl.endsWith("/proxy") ? baseUrl : `${baseUrl}/proxy`;
     const nav = renderToolNav(request, "proxy");
     return `
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="${LANGUAGES[lang].htmlLang}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -181,43 +226,43 @@ function htmlPage(request) {
         <div class="header">
             <svg class="logo" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
             <h1>Proxy <b>Downloader</b></h1>
-            <div class="subtitle">Universal File Fetcher & Header Fixer</div>
+            <div class="subtitle">${copy.subtitle}</div>
         </div>
 
         <div class="card-main">
             <div class="input-group">
-                <input type="text" id="urlInput" placeholder="Paste file URL (e.g. https://nodejs.org/dist/v22.11.0/node-v22.11.0-x64.msi)" autocomplete="off">
+                <input type="text" id="urlInput" placeholder="${copy.placeholder}" autocomplete="off">
             </div>
         </div>
         <div class="example-pair">
-            <div class="example-row"><span>Original</span><code>https://nodejs.org/dist/v22.11.0/node-v22.11.0-x64.msi</code></div>
-            <div class="example-row"><span>Accelerated</span><code>${downloadBaseUrl}/https://nodejs.org/dist/v22.11.0/node-v22.11.0-x64.msi</code></div>
+            <div class="example-row"><span>${copy.original}</span><code>https://nodejs.org/dist/v22.11.0/node-v22.11.0-x64.msi</code></div>
+            <div class="example-row"><span>${copy.accelerated}</span><code>${downloadBaseUrl}/https://nodejs.org/dist/v22.11.0/node-v22.11.0-x64.msi</code></div>
         </div>
 
         <div class="result-area" id="resultArea">
             <div class="result-card">
-                <span class="label">Browser Download</span>
-                <code id="linkText">Waiting...</code>
-                <a href="#" id="downloadBtn" class="download-btn" target="_blank">Download Now</a>
+                <span class="label">${copy.browserDownload}</span>
+                <code id="linkText">${copy.waiting}</code>
+                <a href="#" id="downloadBtn" class="download-btn" target="_blank">${copy.downloadNow}</a>
             </div>
 
             <div class="result-card">
-                <span class="label">Terminal Commands</span>
+                <span class="label">${copy.terminalCommands}</span>
                 <div class="code-row">
                     <span class="label" style="font-size: 10px; color: #a21caf;">WGET</span>
-                    <code id="wgetText">Waiting...</code>
-                    <button onclick="copy('wgetText')" class="copy-btn">Copy</button>
+                    <code id="wgetText">${copy.waiting}</code>
+                    <button onclick="copy('wgetText')" class="copy-btn">${copy.copy}</button>
                 </div>
                 <div class="code-row" style="margin-bottom: 0;">
                     <span class="label" style="font-size: 10px; color: #a21caf;">CURL</span>
-                    <code id="curlText">Waiting...</code>
-                    <button onclick="copy('curlText')" class="copy-btn">Copy</button>
+                    <code id="curlText">${copy.waiting}</code>
+                    <button onclick="copy('curlText')" class="copy-btn">${copy.copy}</button>
                 </div>
             </div>
         </div>
 
         <div class="tips">
-            <span class="badge">WGET</span> 标准下载 <span class="badge">CURL</span> -O 保存文件
+            ${copy.tips}
         </div>
     </div>
 
@@ -227,6 +272,7 @@ function htmlPage(request) {
 
     <script>
         const downloadBaseUrl = "${downloadBaseUrl}";
+        const copiedText = ${JSON.stringify(copy.copied)};
         const input = document.getElementById('urlInput');
         const resultArea = document.getElementById('resultArea');
         const downloadBtn = document.getElementById('downloadBtn');
@@ -262,7 +308,7 @@ function htmlPage(request) {
             navigator.clipboard.writeText(document.getElementById(id).innerText).then(() => {
                 const btn = document.querySelector('#' + id + ' + .copy-btn');
                 const originalText = btn.innerText;
-                btn.innerText = "Copied!";
+                btn.innerText = copiedText;
                 btn.style.background = "#d946ef";
                 btn.style.color = "#fff";
                 setTimeout(() => { 

@@ -1,3 +1,4 @@
+import { getLanguage, LANGUAGES } from "../i18n.js";
 import { getToolBaseUrl, renderToolNav } from "../navigation.js";
 import { corsPreflightResponse, escapeHtml, htmlResponse, joinUrlPath, proxyRequest, textResponse } from "../proxy-utils.js";
 
@@ -6,6 +7,24 @@ const REPOSITORIES = {
   google: "https://dl.google.com/dl/android/maven2",
   "gradle-plugin": "https://plugins.gradle.org/m2",
   jitpack: "https://jitpack.io",
+};
+
+const COPY = {
+  en: {
+    lead: "Unified path proxy for Maven Central, Google Maven, Gradle Plugin Portal, and JitPack.",
+    mapping: "Example mapping",
+    note: "Status: Test. Downloads and metadata proxying are available; validate Gradle plugin markers and private repository auth per project.",
+  },
+  es: {
+    lead: "Proxy unificado para Maven Central, Google Maven, Gradle Plugin Portal y JitPack.",
+    mapping: "Ejemplo de mapeo",
+    note: "Estado: Test. Descargas y metadata estan disponibles; valida plugin markers y repos privados por proyecto.",
+  },
+  zh: {
+    lead: "为 Maven Central、Google Maven、Gradle Plugin Portal 和 JitPack 提供统一路径代理。",
+    mapping: "映射示例",
+    note: "状态：Test。下载和 metadata 代理已可用；Gradle plugin marker 与私有仓库认证建议先做项目级验证。",
+  },
 };
 
 export default {
@@ -36,9 +55,11 @@ export default {
 };
 
 function renderPage(request, baseUrl) {
+  const lang = getLanguage(request);
+  const copy = COPY[lang] ?? COPY.en;
   const nav = renderToolNav(request, "maven");
   return `<!doctype html>
-<html lang="zh-CN">
+<html lang="${LANGUAGES[lang].htmlLang}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -51,15 +72,15 @@ function renderPage(request, baseUrl) {
     <section class="hero">
       <span class="status">Test accelerator</span>
       <h1>Maven / Gradle Proxy</h1>
-      <p>为 Maven Central、Google Maven、Gradle Plugin Portal 和 JitPack 提供统一路径代理。</p>
+      <p>${escapeHtml(copy.lead)}</p>
     </section>
     <section class="grid">
       ${commandCard("Gradle Kotlin DSL", `repositories {\n    maven { url = uri("${baseUrl}/maven-central") }\n    maven { url = uri("${baseUrl}/google") }\n    maven { url = uri("${baseUrl}/gradle-plugin") }\n}`)}
       ${commandCard("Gradle Groovy DSL", `repositories {\n    maven { url "${baseUrl}/maven-central" }\n    maven { url "${baseUrl}/google" }\n    maven { url "${baseUrl}/gradle-plugin" }\n}`)}
       ${commandCard("Maven Central path", `${baseUrl}/maven-central/com/google/guava/guava/maven-metadata.xml`)}
-      ${commandCard("Example mapping", `Original:\nhttps://repo1.maven.org/maven2/com/google/guava/guava/maven-metadata.xml\n\nAccelerated:\n${baseUrl}/maven-central/com/google/guava/guava/maven-metadata.xml`)}
+      ${commandCard(copy.mapping, `Original:\nhttps://repo1.maven.org/maven2/com/google/guava/guava/maven-metadata.xml\n\nAccelerated:\n${baseUrl}/maven-central/com/google/guava/guava/maven-metadata.xml`)}
     </section>
-    <p class="note">状态：Test。下载和 metadata 代理已可用；Gradle plugin marker 与私有仓库认证建议先做项目级验证。</p>
+    <p class="note">${escapeHtml(copy.note)}</p>
   </main>
 </body>
 </html>`;

@@ -1,7 +1,26 @@
+import { getLanguage, LANGUAGES } from "../i18n.js";
 import { getToolBaseUrl, renderToolNav } from "../navigation.js";
 import { corsPreflightResponse, escapeHtml, htmlResponse, joinUrlPath, proxyRequest } from "../proxy-utils.js";
 
 const UPSTREAM = "https://registry.npmjs.org";
+
+const COPY = {
+  en: {
+    lead: "Proxy npm registry metadata and tarball downloads for temporary or persistent Node.js dependency installs.",
+    note: "Status: Test. Registry metadata rewrite and tarball downloads are supported; private npm tokens and publish flows should be validated in a test environment.",
+    mapping: "Example mapping",
+  },
+  es: {
+    lead: "Proxy de metadata y tarballs de npm para instalaciones temporales o persistentes en proyectos Node.js.",
+    note: "Estado: Test. Soporta metadata rewrite y tarballs; valida tokens privados y publish en un entorno de prueba.",
+    mapping: "Ejemplo de mapeo",
+  },
+  zh: {
+    lead: "代理 npm registry metadata 与 tarball 下载，适合 Node.js 项目安装依赖时临时或长期配置。",
+    note: "状态：Test。已支持 registry metadata rewrite 和 tarball 下载；企业私有 npm token、publish 流程建议先在测试环境验证。",
+    mapping: "映射示例",
+  },
+};
 
 export default {
   async fetch(request) {
@@ -32,13 +51,15 @@ function rewriteRegistryUrls(body, baseUrl) {
 }
 
 function renderPage(request, baseUrl) {
+  const lang = getLanguage(request);
+  const copy = COPY[lang] ?? COPY.en;
   const nav = renderToolNav(request, "npm");
   const npmCommand = `npm install lodash --registry=${baseUrl}/`;
   const pnpmCommand = `pnpm install lodash --registry=${baseUrl}/`;
   const yarnCommand = `yarn config set registry ${baseUrl}/`;
 
   return `<!doctype html>
-<html lang="zh-CN">
+<html lang="${LANGUAGES[lang].htmlLang}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -51,16 +72,16 @@ function renderPage(request, baseUrl) {
     <section class="hero">
       <span class="status">Test accelerator</span>
       <h1>npm / pnpm / yarn Proxy</h1>
-      <p>代理 npm registry metadata 与 tarball 下载，适合 Node.js 项目安装依赖时临时或长期配置。</p>
+      <p>${escapeHtml(copy.lead)}</p>
     </section>
     <section class="grid">
       ${commandCard("npm", npmCommand)}
       ${commandCard("pnpm", pnpmCommand)}
       ${commandCard("yarn", yarnCommand)}
       ${commandCard(".npmrc", `registry=${baseUrl}/`)}
-      ${commandCard("Example mapping", `Original:\nnpm install lodash --registry=https://registry.npmjs.org/\n\nAccelerated:\nnpm install lodash --registry=${baseUrl}/`)}
+      ${commandCard(copy.mapping, `Original:\nnpm install lodash --registry=https://registry.npmjs.org/\n\nAccelerated:\nnpm install lodash --registry=${baseUrl}/`)}
     </section>
-    <p class="note">状态：Test。已支持 registry metadata rewrite 和 tarball 下载；企业私有 npm token、publish 流程建议先在测试环境验证。</p>
+    <p class="note">${escapeHtml(copy.note)}</p>
   </main>
 </body>
 </html>`;

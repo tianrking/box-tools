@@ -1,8 +1,33 @@
+import { getLanguage, LANGUAGES } from "../i18n.js";
 import { getToolBaseUrl, renderToolNav } from "../navigation.js";
 import { corsPreflightResponse, escapeHtml, htmlResponse, joinUrlPath, proxyRequest } from "../proxy-utils.js";
 
 const INDEX_UPSTREAM = "https://index.crates.io";
 const DOWNLOAD_UPSTREAM = "https://static.crates.io/crates";
+
+const COPY = {
+  en: {
+    lead: "Proxy the crates.io sparse index and crate downloads for Rust / Cargo dependency fetching.",
+    env: "One-shot environment variable",
+    testIndex: "Test index",
+    mapping: "Example mapping",
+    note: "Status: Test. Sparse index and crate downloads are proxied; publish, yank, and token APIs are outside the current stable scope.",
+  },
+  es: {
+    lead: "Proxy del sparse index de crates.io y descargas .crate para Rust / Cargo.",
+    env: "Variable de entorno puntual",
+    testIndex: "Probar index",
+    mapping: "Ejemplo de mapeo",
+    note: "Estado: Test. Sparse index y descargas .crate estan proxied; publish, yank y token API quedan fuera del alcance estable.",
+  },
+  zh: {
+    lead: "代理 crates.io sparse index 和 crate 包下载，适合 Rust / Cargo 项目依赖拉取。",
+    env: "单次环境变量",
+    testIndex: "测试 index",
+    mapping: "映射示例",
+    note: "状态：Test。Sparse index 与 crate download 已代理；publish、yank、token API 不在当前稳定范围。",
+  },
+};
 
 export default {
   async fetch(request) {
@@ -52,9 +77,11 @@ function rewriteSparseConfig(body, baseUrl, pathname) {
 }
 
 function renderPage(request, baseUrl) {
+  const lang = getLanguage(request);
+  const copy = COPY[lang] ?? COPY.en;
   const nav = renderToolNav(request, "crates");
   return `<!doctype html>
-<html lang="zh-CN">
+<html lang="${LANGUAGES[lang].htmlLang}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -67,15 +94,15 @@ function renderPage(request, baseUrl) {
     <section class="hero">
       <span class="status">Test accelerator</span>
       <h1>crates.io Sparse Proxy</h1>
-      <p>代理 crates.io sparse index 和 crate 包下载，适合 Rust / Cargo 项目依赖拉取。</p>
+      <p>${escapeHtml(copy.lead)}</p>
     </section>
     <section class="grid">
       ${commandCard(".cargo/config.toml", `[source.crates-io]\nreplace-with = "devbox"\n\n[source.devbox]\nregistry = "sparse+${baseUrl}/"`)}
-      ${commandCard("单次环境变量", `CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse cargo fetch`)}
-      ${commandCard("测试 index", `${baseUrl}/config.json`)}
-      ${commandCard("Example mapping", `Original:\nsparse+https://index.crates.io/\nserde = "1"\n\nAccelerated:\nsparse+${baseUrl}/\nserde = "1"`)}
+      ${commandCard(copy.env, `CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse cargo fetch`)}
+      ${commandCard(copy.testIndex, `${baseUrl}/config.json`)}
+      ${commandCard(copy.mapping, `Original:\nsparse+https://index.crates.io/\nserde = "1"\n\nAccelerated:\nsparse+${baseUrl}/\nserde = "1"`)}
     </section>
-    <p class="note">状态：Test。Sparse index 与 crate download 已代理；publish、yank、token API 不在当前稳定范围。</p>
+    <p class="note">${escapeHtml(copy.note)}</p>
   </main>
 </body>
 </html>`;
