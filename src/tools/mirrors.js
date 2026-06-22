@@ -222,7 +222,9 @@ function htmlPage(request) {
         }
         .copy-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-        .footer { margin-top: 40px; text-align: center; font-size: 12px; color: #94a3b8; }
+        .footer { margin-top: 40px; text-align: center; font-size: 12px; color: #64748b; }
+        .footer a { color: #475569; font-weight: 700; }
+        .heart { color: #be123c; }
 
         @keyframes fadeUp { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         @media (max-width: 640px) {

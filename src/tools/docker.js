@@ -168,8 +168,8 @@ function htmlPage(request) {
             --text-main: #24292f; 
             --text-muted: #57606a; 
             --accent: #0969da; 
-            --btn-bg: #0db7ed; /* Docker Blue */
-            --btn-hover: #089dc9; 
+            --btn-bg: #0369a1; /* accessible Docker Blue */
+            --btn-hover: #075985;
             --border: #d0d7de; 
             --cmd-bg: #161b22; 
             --cmd-text: #7ee787; 
@@ -243,9 +243,9 @@ function htmlPage(request) {
         .container:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12); }
         
         .header { margin-bottom: 30px; }
-        .logo { width: 64px; height: 64px; margin-bottom: 15px; fill: #0db7ed; }
+        .logo { width: 64px; height: 64px; margin-bottom: 15px; fill: #0369a1; }
         h1 { font-size: 24px; font-weight: 300; letter-spacing: -0.5px; margin: 0; }
-        h1 b { font-weight: 600; color: #0db7ed; }
+        h1 b { font-weight: 600; color: #0369a1; }
         
         .input-group { margin-bottom: 25px; text-align: left; position: relative; }
         label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; color: var(--text-main); }
@@ -301,12 +301,12 @@ function htmlPage(request) {
         
         .tips { margin-top: 30px; font-size: 13px; color: var(--text-muted); text-align: left; border-top: 1px solid var(--border); padding-top: 20px; }
         .tips p { margin-bottom: 8px; display: flex; align-items: center; }
-        .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; margin-right: 8px; background: #e1f6fc; color: #0db7ed; border: 1px solid rgba(13, 183, 237, 0.2); }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 800; margin-right: 8px; background: #e1f6fc; color: #075985; border: 1px solid rgba(7, 89, 133, 0.22); }
         
         .footer { margin-top: 30px; font-size: 13px; color: rgba(36, 41, 47, 0.6); text-align: center; position: relative; z-index: 1; }
         .footer a { text-decoration: none; color: var(--text-muted); font-weight: 600; transition: color 0.2s; }
         .footer a:hover { color: var(--accent); }
-        .heart { color: #bf3989; margin: 0 4px; display: inline-block; animation: beat 1.5s infinite; }
+        .heart { color: #be123c; margin: 0 4px; display: inline-block; animation: beat 1.5s infinite; }
         
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }

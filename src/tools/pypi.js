@@ -252,12 +252,12 @@ function htmlPage(request) {
         .copy-btn:active { transform: translateY(-50%) scale(0.96); }
         .tips { margin-top: 30px; font-size: 13px; color: var(--text-muted); text-align: left; border-top: 1px solid var(--border); padding-top: 20px; }
         .tips p { margin-bottom: 8px; display: flex; align-items: center; }
-        .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; margin-right: 8px; background: #fff0eb; color: #ee4c2c; border: 1px solid rgba(238, 76, 44, 0.2); }
-        .badge-blue { background: #e1f6fc; color: #3775a9; border: 1px solid rgba(55, 117, 169, 0.2); }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 800; margin-right: 8px; background: #fff0eb; color: #9f1239; border: 1px solid rgba(159, 18, 57, 0.22); }
+        .badge-blue { background: #e1f6fc; color: #1d4ed8; border: 1px solid rgba(29, 78, 216, 0.22); }
         .footer { margin-top: 30px; font-size: 13px; color: rgba(36, 41, 47, 0.6); text-align: center; position: relative; z-index: 1; }
         .footer a { text-decoration: none; color: var(--text-muted); font-weight: 600; transition: color 0.2s; }
         .footer a:hover { color: var(--accent); }
-        .heart { color: #bf3989; margin: 0 4px; display: inline-block; animation: beat 1.5s infinite; }
+        .heart { color: #be123c; margin: 0 4px; display: inline-block; animation: beat 1.5s infinite; }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
     </style>

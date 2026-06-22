@@ -280,8 +280,8 @@ function htmlPage(request) {
       --muted: #647084;
       --border: #dbe3ee;
       --blue: #2563eb;
-      --green: #16a34a;
-      --orange: #f97316;
+      --green: #166534;
+      --orange: #c2410c;
       --violet: #7c3aed;
       --pink: #d946ef;
       --slate: #0f172a;

@@ -154,7 +154,7 @@ function htmlPage(request) {
         .card:hover .icon { background: var(--color); color: #fff; transform: scale(1.1) rotate(-5deg); box-shadow: 0 10px 20px -5px var(--color); }
         .icon svg { width: 30px; height: 30px; fill: currentColor; }
 
-        .arrow-icon { font-size: 24px; color: #cbd5e1; transition: all 0.3s; }
+        .arrow-icon { font-size: 24px; color: #64748b; transition: all 0.3s; }
         .card:hover .arrow-icon { color: var(--color); transform: translateX(5px); }
 
         .title { font-weight: 800; font-size: 1.4rem; margin-bottom: 12px; letter-spacing: -0.5px; color: #1e293b; }
@@ -174,11 +174,11 @@ function htmlPage(request) {
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%;
         }
         .action-btn {
-            font-size: 0.8rem; font-weight: 700; color: var(--color); text-transform: uppercase;
-            background: #fff; padding: 6px 12px; border-radius: 8px; border: none;
+            font-size: 0.8rem; font-weight: 800; color: #fff; text-transform: uppercase;
+            background: #0f172a; padding: 6px 12px; border-radius: 8px; border: 1px solid #0f172a;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; transition: all 0.2s;
         }
-        .action-btn:hover { background: var(--color); color: #fff; }
+        .action-btn:hover { background: #1e293b; color: #fff; }
 
         /* --- Modal --- */
         .modal-overlay {

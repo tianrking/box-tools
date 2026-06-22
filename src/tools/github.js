@@ -329,7 +329,7 @@ function htmlPage(request) {
         }
         .footer a { text-decoration: none; color: var(--text-muted); font-weight: 600; transition: color 0.2s; }
         .footer a:hover { color: var(--accent); }
-        .heart { color: #bf3989; margin: 0 4px; display: inline-block; animation: beat 1.5s infinite; }
+        .heart { color: #be123c; margin: 0 4px; display: inline-block; animation: beat 1.5s infinite; }
 
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
