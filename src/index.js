@@ -1,5 +1,5 @@
 import portal from "./tools/portal.js";
-import { HEALTH_PATHS, HELP_DEFINITION, PROJECT, TOOL_DEFINITIONS } from "./config.js";
+import { ADS_TXT, HEALTH_PATHS, HELP_DEFINITION, PROJECT, TOOL_DEFINITIONS } from "./config.js";
 import docker from "./tools/docker.js";
 import github from "./tools/github.js";
 import help from "./tools/help.js";
@@ -43,6 +43,14 @@ PATH_ROUTES.set("box", { key: "portal", handler: portal });
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+
+    if (url.pathname === "/ads.txt") {
+      return textResponse(`${ADS_TXT}\n`, {
+        headers: {
+          "Cache-Control": "public, max-age=3600",
+        },
+      });
+    }
 
     if (HEALTH_PATHS.has(url.pathname)) {
       return jsonResponse({
@@ -90,6 +98,15 @@ function jsonResponse(body, init = {}) {
   headers.set("Content-Type", "application/json; charset=utf-8");
   headers.set("Cache-Control", "no-store");
   return new Response(JSON.stringify(body, null, 2), {
+    ...init,
+    headers,
+  });
+}
+
+function textResponse(body, init = {}) {
+  const headers = new Headers(init.headers);
+  headers.set("Content-Type", "text/plain; charset=utf-8");
+  return new Response(body, {
     ...init,
     headers,
   });

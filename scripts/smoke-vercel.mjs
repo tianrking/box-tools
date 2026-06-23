@@ -43,6 +43,16 @@ const checks = [
     },
   },
   {
+    name: "ads.txt",
+    request: new Request(`${BASE_URL}/ads.txt`),
+    assert: async (response) => {
+      const text = await response.text();
+      return response.status === 200
+        && response.headers.get("content-type")?.includes("text/plain")
+        && text.trim() === "google.com, pub-8741919641227561, DIRECT, f08c47fec0942fa0";
+    },
+  },
+  {
     name: "portal path route",
     request: new Request(`${BASE_URL}/edgemirror`),
     assert: async (response) => response.status === 200 && response.headers.get("content-type")?.includes("text/html"),

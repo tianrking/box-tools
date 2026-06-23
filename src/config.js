@@ -5,6 +5,8 @@ export const PROJECT = {
   description: "An edge mirror gateway for developer sources, package registries, model hubs, Docker images, Linux mirrors, runtime downloads, and universal file forwarding.",
 };
 
+export const ADS_TXT = "google.com, pub-8741919641227561, DIRECT, f08c47fec0942fa0";
+
 export const HEALTH_PATHS = new Set(["/health", "/healthz", "/__health"]);
 
 export const TOOL_DEFINITIONS = [
